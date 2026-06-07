@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: node-app-ingress
+  namespace: default
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    # HTTPS on 443 + redirect HTTP → HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80,"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # ACM certificate for api.fawasam.in
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:037049058245:certificate/74ae5592-412d-4656-96dc-beb92ad20af3
+spec:
+  ingressClassName: alb
+  rules:
+    - host: api.fawasam.in
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: node-app-service
+                port:
+                  number: 80

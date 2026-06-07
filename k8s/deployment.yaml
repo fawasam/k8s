@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app
+  namespace: default
+  labels:
+    app: node-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+        - name: node-app
+          image: 037049058245.dkr.ecr.ap-south-1.amazonaws.com/k8s-node-app:v5.0.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            - name: APP_VERSION
+              value: "5.0.0"
+
+            # ── From ConfigMap ──────────────────────────────
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config   # ConfigMap name
+                  key: APP_ENV            # key inside ConfigMap
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config
+                  key: DB_HOST
+
+            # ── From Secret ─────────────────────────────────
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: node-app-secret   # Secret name
+                  key: DB_USER            # key inside Secret
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: node-app-secret
+                  key: DB_PASSWORD
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
