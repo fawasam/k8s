@@ -2,22 +2,20 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: node-app-ingress
-  namespace: default
+  namespace: dev
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-path: /health
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80,"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    # All 3 domain certs on the same ALB
-    alb.ingress.kubernetes.io/certificate-arn: >-
-      arn:aws:acm:ap-south-1:037049058245:certificate/74ae5592-412d-4656-96dc-beb92ad20af3,
-      arn:aws:acm:ap-south-1:037049058245:certificate/bf994b30-516d-4d03-aa39-970d553c2c22,
-      arn:aws:acm:ap-south-1:037049058245:certificate/313e44f0-1ca8-46c9-97e7-46ef7c996dfc
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:037049058245:certificate/313e44f0-1ca8-46c9-97e7-46ef7c996dfc
+    # Share the same ALB as prod (cost saving)
+    alb.ingress.kubernetes.io/group.name: node-app
 spec:
   ingressClassName: alb
   rules:
-    - host: api.fawasam.in
+    - host: dev.fawasam.in
       http:
         paths:
           - path: /
