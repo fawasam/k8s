@@ -1,0 +1,28 @@
+# Override only what's different in dev
+replicaCount: 1
+
+app:
+  env: "development"
+
+resources:
+  requests:
+    cpu: "50m"
+    memory: "64Mi"
+  limits:
+    cpu: "100m"
+    memory: "128Mi"
+
+autoscaling:
+  enabled: false      # no autoscaling in dev
+
+config:
+  APP_ENV: "development"
+  DB_HOST: "postgres-dev.internal.svc.cluster.local"
+  LOG_LEVEL: "debug"
+
+externalSecret:
+  ssmPath: "/node-app/dev"
+
+ingress:
+  host: "dev.fawasam.in"
+  certificateArn: "arn:aws:acm:ap-south-1:037049058245:certificate/313e44f0-1ca8-46c9-97e7-46ef7c996dfc"

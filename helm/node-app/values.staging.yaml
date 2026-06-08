@@ -1,0 +1,22 @@
+# Override only what's different in staging
+replicaCount: 1
+
+app:
+  env: "staging"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+
+config:
+  APP_ENV: "staging"
+  DB_HOST: "postgres-staging.internal.svc.cluster.local"
+  LOG_LEVEL: "info"
+
+externalSecret:
+  ssmPath: "/node-app/staging"
+
+ingress:
+  host: "staging.fawasam.in"
+  certificateArn: "arn:aws:acm:ap-south-1:037049058245:certificate/bf994b30-516d-4d03-aa39-970d553c2c22"

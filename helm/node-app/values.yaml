@@ -1,0 +1,61 @@
+# ── Default values (production) ──────────────────────────────────────────────
+# Override per environment:
+#   helm install ... -f values.dev.yaml
+#   helm install ... --set image.tag=v6.0.0
+
+image:
+  repository: 037049058245.dkr.ecr.ap-south-1.amazonaws.com/k8s-node-app
+  tag: "v5.0.0"
+  pullPolicy: IfNotPresent
+
+app:
+  port: 3000
+  version: "5.0.0"
+  env: "production"
+
+# Replicas
+replicaCount: 2
+
+# Resource limits
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# ConfigMap values
+config:
+  APP_ENV: "production"
+  DB_HOST: "postgres.internal.svc.cluster.local"
+  DB_PORT: "5432"
+  LOG_LEVEL: "info"
+
+# External Secret (SSM)
+externalSecret:
+  enabled: true
+  refreshInterval: "1h"
+  ssmPath: "/node-app/prod"   # SSM prefix path
+
+# Ingress
+ingress:
+  enabled: true
+  host: "api.fawasam.in"
+  certificateArn: "arn:aws:acm:ap-south-1:037049058245:certificate/74ae5592-412d-4656-96dc-beb92ad20af3"
+
+# Health checks
+probes:
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 15
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
