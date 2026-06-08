@@ -1,0 +1,43 @@
+# Role = permissions scoped to ONE namespace (dev)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dev-team-role
+  namespace: dev
+rules:
+  # Can view pods, logs, exec into pods
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "pods/exec"]
+    verbs: ["get", "list", "watch", "create"]
+
+  # Can view and update deployments (deploy new versions)
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+
+  # Can view services and configmaps
+  - apiGroups: [""]
+    resources: ["services", "configmaps"]
+    verbs: ["get", "list", "watch"]
+
+  # Can view secrets (NOT create/delete)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+
+  # CANNOT: delete deployments, access other namespaces
+---
+# RoleBinding = attach Role to dev-team group
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-team-binding
+  namespace: dev
+subjects:
+  - kind: Group
+    name: dev-team          # AWS IAM group name
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: dev-team-role
+  apiGroup: rbac.authorization.k8s.io

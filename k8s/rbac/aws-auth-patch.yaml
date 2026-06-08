@@ -1,0 +1,37 @@
+# This shows how to map AWS IAM users → K8s RBAC groups
+# Run: kubectl edit configmap aws-auth -n kube-system
+# and ADD these entries under mapUsers
+
+# Full aws-auth mapUsers section (includes existing github-actions-eks + new team users)
+# Replace YOUR_ACCOUNT_ID with: 037049058245
+
+mapUsers: |
+  # Existing CI/CD user
+  - userarn: arn:aws:iam::037049058245:user/github-actions-eks
+    username: github-actions-eks
+    groups:
+      - system:masters
+
+  # Dev team member → maps to dev-team K8s group → dev namespace only
+  - userarn: arn:aws:iam::037049058245:user/alice-dev
+    username: alice-dev
+    groups:
+      - dev-team
+
+  # Staging team member → staging namespace only
+  - userarn: arn:aws:iam::037049058245:user/bob-staging
+    username: bob-staging
+    groups:
+      - staging-team
+
+  # Ops/SRE → full cluster access
+  - userarn: arn:aws:iam::037049058245:user/charlie-ops
+    username: charlie-ops
+    groups:
+      - ops-team
+
+  # QA / readonly → can view all namespaces, cannot change anything
+  - userarn: arn:aws:iam::037049058245:user/diana-qa
+    username: diana-qa
+    groups:
+      - readonly-team
