@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: node-app-monitor
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack    # must match Prometheus selector
+spec:
+  namespaceSelector:
+    matchNames:
+      - default                       # scrape prod namespace
+      - staging
+      - dev
+  selector:
+    matchLabels:
+      app: node-app
+  endpoints:
+    - port: http
+      path: /health                   # your health endpoint
+      interval: 30s                   # scrape every 30 seconds

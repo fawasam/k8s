@@ -3,12 +3,15 @@ kind: Service
 metadata:
   name: node-app-service
   namespace: default
+  labels:
+    app: node-app                 # needed for ServiceMonitor selector
 spec:
   # ClusterIP = internal only, Ingress handles external traffic
   type: ClusterIP
   selector:
     app: node-app             # Routes traffic to pods with this label
   ports:
-    - protocol: TCP
-      port: 80                # External port
-      targetPort: 3000        # Container port
+    - name: http              # named port — required for ServiceMonitor
+      protocol: TCP
+      port: 80
+      targetPort: 3000
